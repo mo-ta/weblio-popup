@@ -1,0 +1,31 @@
+#!/usr/bin/env zsh
+
+is_run=`ps aux | grep gxmessage | grep borderless | awk '{print $2;}'`
+#is_run=""
+
+if [ ${is_run:-""} != "" ]; then
+	kill ${is_run}
+else
+        w3m "http://api.weblio.jp/act/quote/v_1_0/e/?type=elarge&q=`xsel`" \
+	     -dump \
+             -cols 45 \
+        |\
+        sed -e '1s/^/########################################\nキーワード:/' \
+            -e '2s/^/########################################\n/' \
+            -e '3,6d'\
+            -e '/^\*/d'\
+            -e '/^non-member/d'\
+            -e 's/━/─/g'\
+            -e 's/──/─/g'\
+            -e 's/単語帳に追加/    --クリップボードが空です--/' \
+        |\
+	gxmessage -file - \
+                  -nearmouse \
+                  -timeout 30 \
+                  -borderless \
+                  -buttons "" \
+	          -fg yellow \
+                  -bg grey   \
+
+fi
+
